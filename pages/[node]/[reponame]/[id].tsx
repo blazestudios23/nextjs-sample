@@ -3,34 +3,27 @@ import { Organization, Repository } from "../../../generated/graphql";
 import { GET_REPOS } from "../../../graphql/queries";
 
 import BaseLayout from "../../../compoenents/BaseLayout";
-import SearchResult from "../../../compoenents/SearchResult";
+import SingleSearchResult from "../../../compoenents/SingleSearchResult";
 import { Client } from "../..";
-import { Node, TypeName } from "../../../utils/types";
-import {
-  getSubNodeEdge,
-  getSubNode,
-  getRepository,
-} from "../../../utils/functions";
+import { Node } from "../../../utils/types";
+import { getSubNode, getRepository } from "../../../utils/functions";
 import { INodeData } from "../../../utils/interfaces";
 
 interface IProps {
-  type: string;
-  node: string;
+  reponame: string;
+  node: Node;
   [Node.repository]: Repository;
   [Node.issue]: INodeData;
-  [Node.issues]: INodeData[];
   [Node.stargazer]: INodeData;
-  [Node.stargazers]: INodeData[];
   [Node.watcher]: INodeData;
-  [Node.watchers]: INodeData[];
 }
 
 const SingleItemDisplay = (props: IProps) => {
   console.log(props);
-
+  const { node } = props;
   return (
     <BaseLayout>
-      <SearchResult data={props[Node[props.node]]} />
+      <SingleSearchResult data={props[Node[props.node]]} />
     </BaseLayout>
   );
 };
@@ -40,17 +33,16 @@ export const getStaticProps: GetStaticProps = async context => {
   // You can use any data fetching library
   console.log(context.params);
 
-  const { type, id, node } = context.params;
-  const name = context.params.repo;
+  const { id, node, reponame } = context.params;
 
   const res = await Client.query({ query: GET_REPOS });
   const org: Organization = await res.data.organization;
-  const repo = getRepository(name, org);
-  // By returning { props: repo }
+  const repo = getRepository(reponame, org);
+  // By returning { props: reponame }
   // will receive `repo` as a prop at build time
   return {
     props: {
-      type,
+      reponame,
       node,
       [Node.repository]: node === Node.repository && repo,
       [Node.issue]: node === Node.issue && getSubNode(node, id, repo),
