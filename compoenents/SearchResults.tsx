@@ -21,7 +21,13 @@ const SearchResults = (props: Props) => (
   <Row>
     {props.repos.map(({ node }) => (
       <Col sm="4" key={node.id}>
-        <Link href={`repo/${TypeName.single}/${node.name}/0-root-repo`}>
+        {console.log(
+          `/${node.name}/${TypeName.single}/${Node.repository}/${node.name}`
+        )}
+
+        <Link
+          href={`/${node.name}/${TypeName.single}/${Node.repository}/${node.name}`}
+        >
           <Card body>
             <CardImg
               width="100%"

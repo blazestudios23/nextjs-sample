@@ -4,12 +4,14 @@ import { Node, TypeName } from "../utils/types";
 import { INodeData } from "../utils/interfaces";
 
 interface Props {
-  data: [INodeData];
+  data: INodeData;
 }
 
 const SearchResults = (props: Props) => BuildTable(props.data);
 
 const BuildTable = (data: INodeData, borderless?: boolean) => {
+  console.log(data);
+  return null;
   const keys = Object.keys(data);
   return (
     <Table borderless={borderless}>
