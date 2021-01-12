@@ -1,7 +1,11 @@
 import { GetStaticProps } from "next";
+import { Organization } from "../../../generated/graphql";
+import { GET_REPOS } from "../../../graphql/queries";
 
-import BaseLayout from "../../compoenents/BaseLayout";
-import SearchResult from "../../compoenents/SearchResult";
+
+import BaseLayout from "../../../compoenents/BaseLayout";
+import SearchResult from "../../../compoenents/SearchResult";
+import { Client } from "../..";
 
 import { Form, Label, Input, Button } from "reactstrap";
 
@@ -17,10 +21,10 @@ export const getStaticProps: GetStaticProps = async context => {
   // Call an external API endpoint to get posts.
   // You can use any data fetching library
 
-  const res = await fetch(
-    `https://api.github.com/repos/intuit/${context.params.name}`
-  );
-  const repo = await res.json();
+  const query = 
+
+  const res = await Client.query({query: GET_REPOS});
+  const repo = await res;
   // By returning { props: repo }
   // will receive `repo` as a prop at build time
   return {
@@ -31,10 +35,10 @@ export const getStaticProps: GetStaticProps = async context => {
 };
 
 export const getStaticPaths = async () => {
-  const res = await fetch("https://api.github.com/users/intuit/repos");
-  const repos = await res.json();
-  const paths = repos.map(repo => ({
-    params: { name: repo.name },
+  const res = await Client.query({ query: GET_REPOS });
+  const org: Organization = await res.data.organization;
+  const paths = org.repositories.edges.map(({node}) => ({
+    params: { [node]: { id: node.name } },
   }));
   return { paths, fallback: false };
 };
