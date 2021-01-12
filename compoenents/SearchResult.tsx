@@ -1,39 +1,15 @@
 import { Table, Button } from "reactstrap";
 import Link from "next/link";
+import { Node, TypeName } from "../utils/types";
+import { INodeData } from "../utils/interfaces";
 
 interface Props {
-  repo: Repo;
+  data: [INodeData];
 }
 
-type Repo = {
-  archive_url: string;
-  archived: boolean;
-  assignees_url: string;
-  blobs_url: string;
-  branches_url: string;
-  clone_url: string;
-  collaborators_url: string;
-  comments_url: string;
-  commits_url: string;
-  compare_url: string;
-  contents_url: string;
-  contributors_url: string;
-  created_at: string;
-  description: string;
-  has_issues: boolean;
-  id: number;
-  name: string;
-  owner: { login: string; avatar_url: string };
-  pushed_at: string;
-  stargazers_count: string;
-  url: string;
-  updated_at: string;
-  watchers_count: string;
-};
+const SearchResults = (props: Props) => BuildTable(props.data);
 
-const SearchResults = (props: Props) => BuildTable(props.repo);
-
-const BuildTable = (data: Repo, borderless?: boolean) => {
+const BuildTable = (data: INodeData, borderless?: boolean) => {
   const keys = Object.keys(data);
   return (
     <Table borderless={borderless}>

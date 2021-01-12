@@ -10,6 +10,7 @@ import {
   Row,
 } from "reactstrap";
 import Link from "next/link";
+import { Node, TypeName } from "../utils/types";
 import { Organization } from "../generated/graphql";
 
 interface Props {
@@ -20,7 +21,7 @@ const SearchResults = (props: Props) => (
   <Row>
     {props.repos.map(({ node }) => (
       <Col sm="4" key={node.id}>
-        <Link href={`repo/${node.name}`}>
+        <Link href={`repo/${TypeName.single}/${node.name}/0-root-repo`}>
           <Card body>
             <CardImg
               width="100%"

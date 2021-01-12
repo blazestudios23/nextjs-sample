@@ -14,7 +14,16 @@ query {
           id
           name
           description
+          forks(first:30){
+            edges{
+              node{
+                name
+              }
+            }
+          }
+          forkCount
           issues(first:30) {
+            totalCount
             edges{
               node{
                 id
@@ -24,6 +33,30 @@ query {
                   login
                 }
                 
+              }
+            }
+          }
+          
+          stargazers(first:30){
+            edges{
+              node{
+                name
+                login
+                company
+                location
+                bio
+              }
+            }
+          }
+          stargazerCount
+          watchers(first:30){
+            edges{
+              node{
+                name
+                login
+                company
+                location
+                bio
               }
             }
           }
