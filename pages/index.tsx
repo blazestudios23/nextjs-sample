@@ -1,19 +1,31 @@
-import Head from "next/head";
-import BaseLayout from "../compoenents/BaseLayout";
-import { Form, FormGroup, Label, Input, Button } from "reactstrap";
+import { GetStaticProps } from "next";
 
-const Home = () => {
+import BaseLayout from "../compoenents/BaseLayout";
+import SearchResults from "../compoenents/SearchResults";
+
+import { Form, Label, Input, Button } from "reactstrap";
+
+const Home = props => {
   return (
     <BaseLayout>
-      <Form inline>
-        <Label for="search" hidden>
-          Password
-        </Label>
-        <Input name="search" id="search" placeholder="search..." />
-
-        <Button>Submit</Button>
-      </Form>
+      <SearchResults repos={props.repos} />
     </BaseLayout>
   );
 };
+
+export const getStaticProps: GetStaticProps = async context => {
+  // Call an external API endpoint to get posts.
+  // You can use any data fetching library
+
+  const res = await fetch("https://api.github.com/users/intuit/repos");
+  const repos = await res.json();
+  // By returning { props: repos }
+  // will receive `repos` as a prop at build time
+  return {
+    props: {
+      repos,
+    },
+  };
+};
+
 export default Home;

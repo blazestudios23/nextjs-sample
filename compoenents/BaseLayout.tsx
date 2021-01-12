@@ -14,6 +14,7 @@ const BaseLayout = props => (
       <ExampleNav />
       <Container>
         <h1>Search GitHub</h1>
+
         {props.children}
       </Container>
     </main>
