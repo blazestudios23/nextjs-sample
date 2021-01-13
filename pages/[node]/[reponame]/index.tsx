@@ -1,27 +1,49 @@
 import { GetStaticProps } from "next";
+import { useRouter } from "next/router";
 import BootstrapTable from "react-bootstrap-table-next";
-import { Organization, Repository } from "../../../generated/graphql";
+import paginationFactory from "react-bootstrap-table2-paginator";
+import { Organization } from "../../../generated/graphql";
 import { GET_REPOS } from "../../../graphql/queries";
 
 import BaseLayout from "../../../compoenents/BaseLayout";
-import SingleSearchResult from "../../../compoenents/SingleSearchResult";
+
 import { Client } from "../..";
 import { Node, NodeArrayList } from "../../../utils/types";
 
 import {
   getSubNodeEdge,
-  getSubNode,
   getRepository,
+  fixTitle,
 } from "../../../utils/functions";
-import { INodeData, IRouteProps } from "../../../utils/interfaces";
+import { IRouteProps } from "../../../utils/interfaces";
 
 const Repo = (props: IRouteProps) => {
-  // console.log(props);
+  const router = useRouter();
   const { node, reponame } = props;
-  console.log(props.issue);
 
+  const results = props[node]?.map(({ node }) => node);
+
+  const cols = Object.keys(results[0])
+    .filter(
+      key =>
+        results[0][key] &&
+        key !== "__typename" &&
+        typeof results[0][key] !== "object"
+    )
+    .map(title => ({
+      dataField: title,
+      text: fixTitle(title),
+      sort: true,
+    }));
+
+  const onClick = (e, row) => {
+    e.preventDefault();
+
+    return router.push(`/${node}/${reponame}/${row.id}`);
+  };
   return (
     <BaseLayout>
+      <h2>{fixTitle(node)}</h2>
       <BootstrapTable
         hover
         bordered={false}
@@ -32,7 +54,7 @@ const Repo = (props: IRouteProps) => {
         data={results}
         columns={cols}
         headerClasses="thead-dark"
-        history={history}
+        // history={router}
         rowEvents={{ onClick }}
         pagination={paginationFactory()}
         defaultSorted={[
@@ -42,11 +64,6 @@ const Repo = (props: IRouteProps) => {
           },
         ]}
       />
-      <SingleSearchResult
-        data={props[Node[props.node]]}
-        node={node}
-        reponame={reponame}
-      />
     </BaseLayout>
   );
 };
@@ -54,7 +71,6 @@ const Repo = (props: IRouteProps) => {
 export const getStaticProps: GetStaticProps = async context => {
   // Call an external API endpoint to get posts.
   // You can use any data fetching library
-  // console.log(context.params);
   const { id, node, reponame } = context.params;
 
   const res = await Client.query({ query: GET_REPOS });
@@ -66,6 +82,7 @@ export const getStaticProps: GetStaticProps = async context => {
     props: {
       reponame,
       node,
+      [Node.author]: node === Node.author && getSubNodeEdge(node, repo),
       [Node.forks]: node === Node.forks && getSubNodeEdge(node, repo),
       [Node.issues]: node === Node.issues && getSubNodeEdge(node, repo),
       [Node.stargazers]: node === Node.stargazers && getSubNodeEdge(node, repo),
@@ -79,15 +96,12 @@ export const getStaticPaths = async () => {
   const org: Organization = await res.data.organization;
   const paths = org.repositories?.edges
     .map(({ node }) =>
-      NodeArrayList.map(
-        nodeName => ({
-          params: {
-            node: nodeName,
-            reponame: node.name,
-          },
-        }),
-        {}
-      )
+      NodeArrayList.map(nodeName => ({
+        params: {
+          node: nodeName,
+          reponame: node.name,
+        },
+      }))
     )
     .flat();
 

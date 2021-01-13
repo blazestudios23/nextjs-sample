@@ -7,16 +7,13 @@ query {
     repositories(first:30){
       edges{
         node{
-          owner{
-            login
-            avatarUrl
-          }
           id
           name
           description
           forks(first:30){
             edges{
               node{
+                  id
                 name
               }
             }
@@ -29,9 +26,7 @@ query {
                 id
                 body
                 bodyText
-                author{
-                  login
-                }
+
                 
               }
             }
@@ -40,7 +35,7 @@ query {
           stargazers(first:30){
             edges{
               node{
-                  id
+                id
                 name
                 login
                 company

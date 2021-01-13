@@ -8,7 +8,7 @@ export const getSubNodeEdge = (
 ): [{ node: { id: string } }] => repo[nodeName]?.edges;
 
 export const getSubNode = (nodeName: Node, id: string | string[], repo: Repository) =>{
-  console.log(getSubNodeEdge(nodeName, repo));
+  // console.log(getSubNodeEdge(nodeName, repo));
   
   return getSubNodeEdge(nodeName, repo).filter(({ node }) => node.id === id)[0].node;
 }
@@ -19,9 +19,13 @@ export const getRepository = (
 ): Repository =>
   org.repositories?.edges.filter(({ node }) => node.name === name)[0]?.node;
 
- export const getSignleItemList = (org: Organization, nodeToFind: string) => org.repositories?.edges
-    .map(({ node }) => getSubnodeIds(node.issues.edges, node.name, nodeToFind))
+ export const getSignleItemList = (org: Organization, nodeToFind: string) => {
+  //  console.log(nodeToFind, org.repositories?.edges[0].node[nodeToFind].edges[0].node.id);
+   
+   return org.repositories?.edges
+    .map(({ node }) => getSubnodeIds(node[nodeToFind].edges, node.name, nodeToFind))
     .flat();
+ }
 
 export const getSubnodeIds = (edges: any[],
     repoName: string, nodeName: string) => {  
@@ -32,3 +36,43 @@ export const getSubnodeIds = (edges: any[],
         id: node.id
     }}))
 }
+
+/**
+ * turns text in to title text such as `Title Of Page`
+ * @function fixTitle
+ * @param {string} str - string to parse and transform
+ * @returns {string} - new string
+ */
+export const fixTitle = (str: string) =>
+  String(str)
+    .replace(/_/g, " ")
+    .replace(/(?: |\b)(\w)/g, str => str.toUpperCase());
+
+    /**
+ * @function removeTrainingChar
+ * @param {object} data - object
+ * @param {string} data.filter - name of filter
+ * @param {string} data.char - chars to remove
+ * @returns {string} -
+ */
+export const removeTrainingChar = ({
+  filter,
+  char
+}: {
+  filter: string;
+  char: string;
+}) => {
+  let newFilter = filter;
+  const reversed = char
+    .split("")
+    .reverse()
+    .join("");
+
+  for (const i of reversed) {
+    newFilter =
+      newFilter.slice(newFilter.length - 1, newFilter.length) === i
+        ? newFilter.slice(0, newFilter.length - 1)
+        : newFilter;
+  }
+  return newFilter;
+};

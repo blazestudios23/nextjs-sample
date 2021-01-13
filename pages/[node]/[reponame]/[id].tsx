@@ -5,12 +5,14 @@ import { GET_REPOS } from "../../../graphql/queries";
 import BaseLayout from "../../../compoenents/BaseLayout";
 import SingleSearchResult from "../../../compoenents/SingleSearchResult";
 import { Client } from "../..";
-import { Node, NodeArraySingle } from "../../../utils/types";
+import { Node, NodeArraySingle, NodeArrayList } from "../../../utils/types";
 import {
   getSubNode,
   getRepository,
   getSubnodeIds,
   getSignleItemList,
+  fixTitle,
+  removeTrainingChar,
 } from "../../../utils/functions";
 import { INodeData, IRouteProps } from "../../../utils/interfaces";
 
@@ -19,6 +21,7 @@ const SingleItemDisplay = (props: IRouteProps) => {
 
   return (
     <BaseLayout>
+      <h2>{fixTitle(removeTrainingChar({ filter: node, char: "s" }))}</h2>
       <SingleSearchResult
         data={props[Node[props.node]]}
         node={node}
@@ -57,18 +60,16 @@ export const getStaticProps: GetStaticProps = async context => {
   //     [Node.repository]: node === Node.repository && repo,
   //   }
   // );
-  // console.log(props);
 
   return {
     props: {
       reponame,
       node,
       [Node.repository]: node === Node.repository && repo,
-      [Node.fork]: node === Node.fork && getSubNode(node, id, repo),
-      [Node.issue]: node === Node.issue && getSubNode(node, id, repo),
-      [Node.owner]: node === Node.owner && getSubNode(node, id, repo),
-      [Node.stargazer]: node === Node.stargazer && getSubNode(node, id, repo),
-      [Node.watcher]: node === Node.watcher && getSubNode(node, id, repo),
+      [Node.forks]: node === Node.forks && getSubNode(node, id, repo),
+      [Node.issues]: node === Node.issues && getSubNode(node, id, repo),
+      [Node.stargazers]: node === Node.stargazers && getSubNode(node, id, repo),
+      [Node.watchers]: node === Node.watchers && getSubNode(node, id, repo),
     },
   };
 };
@@ -86,11 +87,17 @@ export const getStaticPaths = async () => {
   }));
 
   // generates all routes to be pre-rendered
-  const listOfPaths = NodeArraySingle.map(node =>
+  const listOfPaths = NodeArrayList.map(node =>
     getSignleItemList(org, node)
   ).flat();
 
   const paths = [...repository, ...listOfPaths];
+
+  // console.log(
+  //   paths.filter(
+  //     i => i.params.node === Node.stargazers && i.params.reponame === "heirloom"
+  //   )
+  // );
 
   return { paths, fallback: false };
 };

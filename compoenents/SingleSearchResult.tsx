@@ -17,7 +17,9 @@ const BuildTable = (data: INodeData, reponame, borderless?: boolean) => {
     <Table borderless={borderless} className="table mt-2 pt-2 table-hover">
       <tbody>
         {keys.map(key => (
-          <div key={key}>{createLink(data, key, reponame)}</div>
+          <tr key={key} className="d-flex">
+            {createLink(data, key, reponame)}
+          </tr>
         ))}
       </tbody>
     </Table>
@@ -27,21 +29,21 @@ const BuildTable = (data: INodeData, reponame, borderless?: boolean) => {
 const createLink = (data: IProps["data"], key: string, reponame: string) => {
   if (typeof data[key] === "object" && data[key]) {
     return (
-      <tr key={key} className="d-flex">
+      <>
         <td className={"col"}>{key}</td>
         <td className={"col"}>
           <Link href={`/${key}/${reponame}/`}>
             <Button>View {key}</Button>
           </Link>
         </td>
-      </tr>
+      </>
     );
   } else if (data[key]) {
     return (
-      <tr key={key}>
+      <>
         <td className={"col"}>{key}</td>
         <td className={"col"}>{data[key]?.toString()}</td>
-      </tr>
+      </>
     );
   }
   return null;
