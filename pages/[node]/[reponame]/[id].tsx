@@ -5,25 +5,25 @@ import { GET_REPOS } from "../../../graphql/queries";
 import BaseLayout from "../../../compoenents/BaseLayout";
 import SingleSearchResult from "../../../compoenents/SingleSearchResult";
 import { Client } from "../..";
-import { Node } from "../../../utils/types";
-import { getSubNode, getRepository } from "../../../utils/functions";
-import { INodeData } from "../../../utils/interfaces";
+import { Node, NodeArraySingle } from "../../../utils/types";
+import {
+  getSubNode,
+  getRepository,
+  getSubnodeIds,
+  getSignleItemList,
+} from "../../../utils/functions";
+import { INodeData, IRouteProps } from "../../../utils/interfaces";
 
-interface IProps {
-  reponame: string;
-  node: Node;
-  [Node.repository]: Repository;
-  [Node.issue]: INodeData;
-  [Node.stargazer]: INodeData;
-  [Node.watcher]: INodeData;
-}
+const SingleItemDisplay = (props: IRouteProps) => {
+  const { node, reponame } = props;
 
-const SingleItemDisplay = (props: IProps) => {
-  console.log(props);
-  const { node } = props;
   return (
     <BaseLayout>
-      <SingleSearchResult data={props[Node[props.node]]} />
+      <SingleSearchResult
+        data={props[Node[props.node]]}
+        node={node}
+        reponame={reponame}
+      />
     </BaseLayout>
   );
 };
@@ -31,7 +31,6 @@ const SingleItemDisplay = (props: IProps) => {
 export const getStaticProps: GetStaticProps = async context => {
   // Call an external API endpoint to get posts.
   // You can use any data fetching library
-  console.log(context.params);
 
   const { id, node, reponame } = context.params;
 
@@ -55,22 +54,22 @@ export const getStaticProps: GetStaticProps = async context => {
 export const getStaticPaths = async () => {
   const res = await Client.query({ query: GET_REPOS });
   const org: Organization = await res.data.organization;
-  const paths = org.repositories?.edges.map(({ node }) => ({
+
+  const repository = org.repositories?.edges.map(({ node }) => ({
     params: {
-      [Node.repository]: { [node.name]: { id: node.name } },
-      [Node.issue]: {
-        [node.name]: node?.issues?.edges.map(({ node }) => ({ id: node.id })),
-      },
-      [Node.stargazer]: {
-        [node.name]: node?.stargazers?.edges.map(({ node }) => ({
-          id: node.id,
-        })),
-      },
-      [Node.watcher]: {
-        [node.name]: node?.watchers?.edges.map(({ node }) => ({ id: node.id })),
-      },
+      node: Node.repository,
+      reponame: node.name,
+      id: node.name,
     },
   }));
+
+  // generates all routes to be pre-rendered
+  const listOfPaths = NodeArraySingle.map(node =>
+    getSignleItemList(org, node)
+  ).flat();
+
+  const paths = [...repository, ...listOfPaths];
+
   return { paths, fallback: false };
 };
 

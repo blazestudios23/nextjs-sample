@@ -15,3 +15,17 @@ export const getRepository = (
   org: Organization
 ): Repository =>
   org.repositories?.edges.filter(({ node }) => node.name === name)[0]?.node;
+
+ export const getSignleItemList = (org: Organization, nodeToFind: string) => org.repositories?.edges
+    .map(({ node }) => getSubnodeIds(node.issues.edges, node.name, nodeToFind))
+    .flat();
+
+export const getSubnodeIds = (edges: any[],
+    repoName: string, nodeName: string) => {  
+        return edges.map(({ node }) => ({
+          params: {
+        node: nodeName,
+        reponame: repoName,
+        id: node.id
+    }}))
+}

@@ -3,7 +3,7 @@ import { Organization, Repository } from "../../../generated/graphql";
 import { GET_REPOS } from "../../../graphql/queries";
 
 import BaseLayout from "../../../compoenents/BaseLayout";
-import SearchResult from "../../../compoenents/SearchResult";
+import SingleSearchResult from "../../../compoenents/SingleSearchResult";
 import { Client } from "../..";
 import { Node, TypeName } from "../../../utils/types";
 import {
@@ -11,26 +11,19 @@ import {
   getSubNode,
   getRepository,
 } from "../../../utils/functions";
-import { INodeData } from "../../../utils/interfaces";
+import { INodeData, IRouteProps } from "../../../utils/interfaces";
 
-interface IProps {
-  type: string;
-  node: string;
-  [Node.repository]: Repository;
-  [Node.issue]: INodeData;
-  [Node.issues]: INodeData[];
-  [Node.stargazer]: INodeData;
-  [Node.stargazers]: INodeData[];
-  [Node.watcher]: INodeData;
-  [Node.watchers]: INodeData[];
-}
-
-const Repo = (props: IProps) => {
-  console.log(props);
+const Repo = (props: IRouteProps) => {
+  // console.log(props);
+  const { node, reponame } = props;
 
   return (
     <BaseLayout>
-      <SearchResult data={props[Node[props.node]]} />
+      <SingleSearchResult
+        data={props[Node[props.node]]}
+        node={node}
+        reponame={reponame}
+      />
     </BaseLayout>
   );
 };
@@ -38,7 +31,7 @@ const Repo = (props: IProps) => {
 export const getStaticProps: GetStaticProps = async context => {
   // Call an external API endpoint to get posts.
   // You can use any data fetching library
-  console.log(context.params);
+  // console.log(context.params);
 
   const { type, id, node } = context.params;
   const name = context.params.repo;
@@ -52,12 +45,8 @@ export const getStaticProps: GetStaticProps = async context => {
     props: {
       type,
       node,
-      [Node.repository]: node === Node.repository && repo,
-      [Node.issue]: node === Node.issue && getSubNode(node, id, repo),
       [Node.issues]: node === Node.issues && getSubNodeEdge(node, repo),
-      [Node.stargazer]: node === Node.stargazer && getSubNode(node, id, repo),
       [Node.stargazers]: node === Node.stargazers && getSubNodeEdge(node, repo),
-      [Node.watcher]: node === Node.watcher && getSubNode(node, id, repo),
       [Node.watchers]: node === Node.watchers && getSubNodeEdge(node, repo),
     },
   };

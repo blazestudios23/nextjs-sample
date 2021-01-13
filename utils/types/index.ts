@@ -12,3 +12,15 @@ export enum Node {
       watcher= "watcher",
       watchers= "watchers",
 }
+
+export const NodeArraySingle = [
+      "issue",
+      "stargazer",
+      "watcher"
+    ]
+
+export const NodeArrayList = [
+      "issues",
+     "stargazers",
+      "watchers" 
+    ]

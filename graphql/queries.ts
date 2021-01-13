@@ -40,6 +40,7 @@ query {
           stargazers(first:30){
             edges{
               node{
+                  id
                 name
                 login
                 company
@@ -52,6 +53,7 @@ query {
           watchers(first:30){
             edges{
               node{
+                  id
                 name
                 login
                 company
