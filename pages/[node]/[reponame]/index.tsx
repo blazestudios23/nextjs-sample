@@ -1,11 +1,13 @@
 import { GetStaticProps } from "next";
+import BootstrapTable from "react-bootstrap-table-next";
 import { Organization, Repository } from "../../../generated/graphql";
 import { GET_REPOS } from "../../../graphql/queries";
 
 import BaseLayout from "../../../compoenents/BaseLayout";
 import SingleSearchResult from "../../../compoenents/SingleSearchResult";
 import { Client } from "../..";
-import { Node, TypeName } from "../../../utils/types";
+import { Node, NodeArrayList } from "../../../utils/types";
+
 import {
   getSubNodeEdge,
   getSubNode,
@@ -16,9 +18,30 @@ import { INodeData, IRouteProps } from "../../../utils/interfaces";
 const Repo = (props: IRouteProps) => {
   // console.log(props);
   const { node, reponame } = props;
+  console.log(props.issue);
 
   return (
     <BaseLayout>
+      <BootstrapTable
+        hover
+        bordered={false}
+        classes="mt-2 pt-2"
+        bootstrap4
+        data-test="logs-type-table"
+        keyField={"id"}
+        data={results}
+        columns={cols}
+        headerClasses="thead-dark"
+        history={history}
+        rowEvents={{ onClick }}
+        pagination={paginationFactory()}
+        defaultSorted={[
+          {
+            dataField: "id",
+            order: "desc",
+          },
+        ]}
+      />
       <SingleSearchResult
         data={props[Node[props.node]]}
         node={node}
@@ -32,19 +55,18 @@ export const getStaticProps: GetStaticProps = async context => {
   // Call an external API endpoint to get posts.
   // You can use any data fetching library
   // console.log(context.params);
-
-  const { type, id, node } = context.params;
-  const name = context.params.repo;
+  const { id, node, reponame } = context.params;
 
   const res = await Client.query({ query: GET_REPOS });
   const org: Organization = await res.data.organization;
-  const repo = getRepository(name, org);
+  const repo = getRepository(reponame, org);
   // By returning { props: repo }
   // will receive `repo` as a prop at build time
   return {
     props: {
-      type,
+      reponame,
       node,
+      [Node.forks]: node === Node.forks && getSubNodeEdge(node, repo),
       [Node.issues]: node === Node.issues && getSubNodeEdge(node, repo),
       [Node.stargazers]: node === Node.stargazers && getSubNodeEdge(node, repo),
       [Node.watchers]: node === Node.watchers && getSubNodeEdge(node, repo),
@@ -55,33 +77,20 @@ export const getStaticProps: GetStaticProps = async context => {
 export const getStaticPaths = async () => {
   const res = await Client.query({ query: GET_REPOS });
   const org: Organization = await res.data.organization;
-  const paths = org.repositories?.edges.map(({ node }) => ({
-    params: {
-      [node.name]: {
-        [TypeName.single]: { [Node.repository]: { id: node.name } },
-      },
-      [node.name]: {
-        [TypeName.single]: {
-          [Node.issue]: { id: node?.issues?.edges.map(({ node }) => node.id) },
-        },
-      },
-      [node.name]: {
-        [TypeName.list]: {
-          [Node.issues]: node?.issues?.edges.map(({ node }) => ({
-            id: 0,
-          })),
-        },
-      },
-      [Node.stargazer]: node?.stargazers?.edges.map(({ node }) => node),
-      [Node.stargazers]: node?.stargazers?.edges.map(({ node }) => ({
-        id: node.id,
-      })),
-      [Node.watcher]: node?.watchers?.edges.map(({ node }) => node),
-      [Node.watchers]: node?.watchers?.edges.map(({ node }) => ({
-        id: node.id,
-      })),
-    },
-  }));
+  const paths = org.repositories?.edges
+    .map(({ node }) =>
+      NodeArrayList.map(
+        nodeName => ({
+          params: {
+            node: nodeName,
+            reponame: node.name,
+          },
+        }),
+        {}
+      )
+    )
+    .flat();
+
   return { paths, fallback: false };
 };
 

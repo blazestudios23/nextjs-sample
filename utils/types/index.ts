@@ -4,23 +4,29 @@ export enum TypeName {
 }
 
 export enum Node {
-    repository = "repository",
-      issues = "issues",
-      issue = "issue",
-      stargazers= "stargazers",
-      stargazer= "stargazer",
-      watcher= "watcher",
-      watchers= "watchers",
+  fork = "fork",
+  forks = "forks",
+  repository = "repository",
+  issues = "issues",
+  issue = "issue",
+  owner = "owner",
+  stargazers= "stargazers",
+  stargazer= "stargazer",
+  watcher= "watcher",
+  watchers= "watchers",
 }
 
 export const NodeArraySingle = [
-      "issue",
-      "stargazer",
-      "watcher"
-    ]
+  Node.owner,
+  Node.fork,
+  Node.issue,
+  Node.stargazer,
+  Node.watcher
+]
 
 export const NodeArrayList = [
-      "issues",
-     "stargazers",
-      "watchers" 
-    ]
+  Node.forks,
+  Node.issues,
+  Node.stargazers,
+  Node.watchers 
+  ]

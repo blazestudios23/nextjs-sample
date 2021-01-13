@@ -7,8 +7,11 @@ export const getSubNodeEdge = (
   repo: Repository
 ): [{ node: { id: string } }] => repo[nodeName]?.edges;
 
-export const getSubNode = (nodeName: Node, id: string | string[], repo: Repository) =>
-  getSubNodeEdge(nodeName, repo).filter(({ node }) => node.id === id)[0].node;
+export const getSubNode = (nodeName: Node, id: string | string[], repo: Repository) =>{
+  console.log(getSubNodeEdge(nodeName, repo));
+  
+  return getSubNodeEdge(nodeName, repo).filter(({ node }) => node.id === id)[0].node;
+}
 
 export const getRepository = (
   name: string | string[],

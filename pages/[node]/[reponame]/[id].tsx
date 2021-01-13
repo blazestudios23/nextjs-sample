@@ -39,12 +39,34 @@ export const getStaticProps: GetStaticProps = async context => {
   const repo = getRepository(reponame, org);
   // By returning { props: reponame }
   // will receive `repo` as a prop at build time
+
+  // turn prop creation into a function, I had to move on
+  // const props = NodeArraySingle.reduce(
+  //   (obj, i) => {
+  //     if (typeof node === "string" && i === node) {
+  //       return {
+  //         ...obj,
+  //         [node]: getSubNode(Node[node], id, repo),
+  //       };
+  //     }
+  //     return;
+  //   },
+  //   {
+  //     reponame,
+  //     node,
+  //     [Node.repository]: node === Node.repository && repo,
+  //   }
+  // );
+  // console.log(props);
+
   return {
     props: {
       reponame,
       node,
       [Node.repository]: node === Node.repository && repo,
+      [Node.fork]: node === Node.fork && getSubNode(node, id, repo),
       [Node.issue]: node === Node.issue && getSubNode(node, id, repo),
+      [Node.owner]: node === Node.owner && getSubNode(node, id, repo),
       [Node.stargazer]: node === Node.stargazer && getSubNode(node, id, repo),
       [Node.watcher]: node === Node.watcher && getSubNode(node, id, repo),
     },
