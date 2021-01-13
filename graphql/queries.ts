@@ -7,6 +7,11 @@ query {
     repositories(first:30){
       edges{
         node{
+          owner{
+              id
+            login
+            avatarUrl
+          }
           id
           name
           description

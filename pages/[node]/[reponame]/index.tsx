@@ -5,7 +5,7 @@ import paginationFactory from "react-bootstrap-table2-paginator";
 import { Organization } from "../../../generated/graphql";
 import { GET_REPOS } from "../../../graphql/queries";
 
-import BaseLayout from "../../../compoenents/BaseLayout";
+import BaseLayout from "../../../components/BaseLayout";
 
 import { Client } from "../..";
 import { Node, NodeArrayList } from "../../../utils/types";

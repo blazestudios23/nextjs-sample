@@ -1,20 +1,22 @@
 import { GetStaticProps } from "next";
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import fetch from "cross-fetch";
+import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
 import { Organization } from "../generated/graphql";
 
-import BaseLayout from "../compoenents/BaseLayout";
-import SearchResults from "../compoenents/SearchResults";
+import BaseLayout from "../components/BaseLayout";
+import SearchResults from "../components/SearchResults";
 import { GET_REPOS } from "../graphql/queries";
 
 const Home = props => {
   return (
-    <BaseLayout>
+    <BaseLayout data-test="home-page">
       <SearchResults repos={props.repos} />
     </BaseLayout>
   );
 };
 
 export const Client = new ApolloClient({
+  // link: new HttpLink({ uri: "https://api.github.com/graphq", fetch }),
   uri: "https://api.github.com/graphql",
   headers: { Authorization: `bearer ${process.env.NEXT_APP_GITHUB_API_KEY}` },
   cache: new InMemoryCache(),

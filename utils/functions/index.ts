@@ -76,3 +76,12 @@ export const removeTrainingChar = ({
   }
   return newFilter;
 };
+
+/**
+ * Return node(s) with the given data-test attribute.
+ * @param {ShallowWrapper} wrapper - Enzyme shallow ShallowWrapper
+ * @param {string} val - Value of data-test attribute for search.
+ * @return {ShallowWrapper}
+ */
+export const findByTestAttr = (wrapper: any, val: string) =>
+  wrapper.find(`[data-test="${val}"]`);

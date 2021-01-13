@@ -2,8 +2,8 @@ import { GetStaticProps } from "next";
 import { Organization, Repository } from "../../../generated/graphql";
 import { GET_REPOS } from "../../../graphql/queries";
 
-import BaseLayout from "../../../compoenents/BaseLayout";
-import SingleSearchResult from "../../../compoenents/SingleSearchResult";
+import BaseLayout from "../../../components/BaseLayout";
+import SingleSearchResult from "../../../components/SingleSearchResult";
 import { Client } from "../..";
 import { Node, NodeArraySingle, NodeArrayList } from "../../../utils/types";
 import {
@@ -65,7 +65,11 @@ export const getStaticProps: GetStaticProps = async context => {
     props: {
       reponame,
       node,
-      [Node.repository]: node === Node.repository && repo,
+      [Node.repository]:
+        node === Node.repository &&
+        Object.keys(repo)
+          .filter(key => key !== "owner")
+          .reduce((obj, key) => ({ ...obj, [key]: repo[key] }), {}),
       [Node.forks]: node === Node.forks && getSubNode(node, id, repo),
       [Node.issues]: node === Node.issues && getSubNode(node, id, repo),
       [Node.stargazers]: node === Node.stargazers && getSubNode(node, id, repo),
@@ -92,12 +96,6 @@ export const getStaticPaths = async () => {
   ).flat();
 
   const paths = [...repository, ...listOfPaths];
-
-  // console.log(
-  //   paths.filter(
-  //     i => i.params.node === Node.stargazers && i.params.reponame === "heirloom"
-  //   )
-  // );
 
   return { paths, fallback: false };
 };
